@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import Therapist from '../models/therapist.js';
+import { Therapist } from '../models/index.js';
 
 // Add a new therapist
 export const addTherapist = async (req, res) => {
@@ -28,10 +28,8 @@ export const addTherapist = async (req, res) => {
 // Get all therapists (with optional filters)
 export const getTherapists = async (req, res) => {
   try {
-    // Extract query parameters for filtering
     const { status, availability, searchTerm } = req.query;
 
-    // Build the where clause for filtering
     const whereClause = {};
 
     if (status) {
@@ -50,7 +48,6 @@ export const getTherapists = async (req, res) => {
       ];
     }
 
-    // Fetch therapists with filters
     const therapists = await Therapist.findAll({
       where: whereClause,
       attributes: [
@@ -63,16 +60,14 @@ export const getTherapists = async (req, res) => {
         'rating',
         'status',
         'createdAt',
-        // Add any other fields needed for the frontend
       ],
       order: [['createdAt', 'DESC']],
     });
 
-    // Format the data to match the UI requirements
     const formattedTherapists = therapists.map((therapist) => ({
       id: therapist.id,
       name: therapist.name,
-      clinicName: therapist.clinicName || "CP's Reflex Marma", // Default value based on the image
+      clinicName: therapist.clinicName,
       contact: {
         email: therapist.email,
         phone: therapist.phone,
@@ -81,7 +76,6 @@ export const getTherapists = async (req, res) => {
       rating: therapist.rating || 'Not rated',
       status: therapist.status,
       joinedDate: therapist.createdAt,
-      // Add any other fields needed for the frontend
     }));
 
     res.status(200).json({
@@ -119,7 +113,6 @@ export const updateTherapist = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // If there's a file upload, add it to the updates
     if (req.file) {
       updates.file = req.file.filename;
     }
@@ -182,32 +175,27 @@ export const updateTherapistStatus = async (req, res) => {
 
 export const getTherapistStats = async (req, res) => {
   try {
-    // Get total count of therapists
     const totalTherapists = await Therapist.count();
 
-    // Get count of pending therapists
     const pendingTherapists = await Therapist.count({
       where: {
         status: 'Pending',
       },
     });
 
-    // Get count of online therapists
     const onlineTherapists = await Therapist.count({
       where: {
         availability: 'Online',
-        status: 'Approved', // Only count approved therapists who are online
+        status: 'Approved',
       },
     });
 
-    // Get count of approved therapists
     const approvedTherapists = await Therapist.count({
       where: {
         status: 'Approved',
       },
     });
 
-    // Get count of offline therapists (who are approved)
     const offlineTherapists = await Therapist.count({
       where: {
         availability: 'Offline',
@@ -215,7 +203,6 @@ export const getTherapistStats = async (req, res) => {
       },
     });
 
-    // Get recently joined therapists (last 7 days)
     const recentlyJoined = await Therapist.count({
       where: {
         createdAt: {

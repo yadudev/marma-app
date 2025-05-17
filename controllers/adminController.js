@@ -1,10 +1,9 @@
 import { Op } from 'sequelize';
-import { User, Role } from '../models/index.js';
+import { User, Role, OtpLog } from '../models/index.js';
 import { successResponse, errorResponse } from '../utils/responseHandler.js';
 
 export const getDashboard = async (req, res) => {
   try {
-    // Find admin role
     const adminRole = await Role.findOne({ where: { name: 'admin' } });
 
     const totalUsers = await User.count({
@@ -22,7 +21,7 @@ export const getDashboard = async (req, res) => {
         bookingsThisMonth = await Booking.count({
           where: {
             createdAt: {
-              [Op.gte]: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // Start of current month
+              [Op.gte]: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             },
           },
         });
@@ -87,7 +86,6 @@ export const getUserList = async (req, res) => {
       whereClause.status = status;
     }
 
-    // Build role filter
     const includeClause = {
       model: Role,
       attributes: ['id', 'name'],
@@ -97,7 +95,6 @@ export const getUserList = async (req, res) => {
       includeClause.where = { name: role };
     }
 
-    // Validate sortBy to prevent SQL injection
     const allowedSortFields = [
       'id',
       'name',
@@ -109,10 +106,8 @@ export const getUserList = async (req, res) => {
     ];
     const validSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
 
-    // Validate sortOrder
     const validSortOrder = ['ASC', 'DESC'].includes(sortOrder.toUpperCase()) ? sortOrder : 'DESC';
 
-    // Get users with pagination
     const { count, rows: users } = await User.findAndCountAll({
       where: whereClause,
       include: includeClause,
@@ -150,7 +145,6 @@ export const changeUserStatus = async (req, res) => {
       return errorResponse(res, 404, 'User not found');
     }
 
-    // Admin cannot change their own status
     if (user.id === req.user.id) {
       return errorResponse(res, 403, 'You cannot change your own status');
     }
@@ -182,7 +176,6 @@ export const deleteUser = async (req, res) => {
       return errorResponse(res, 404, 'User not found');
     }
 
-    // Prevent admin from deleting their own account
     if (user.id === req.user.id) {
       return errorResponse(res, 403, 'You cannot delete your own account');
     }
@@ -193,5 +186,84 @@ export const deleteUser = async (req, res) => {
   } catch (error) {
     console.error('Delete user error:', error);
     return errorResponse(res, 500, 'Server error');
+  }
+};
+
+export const getOtpLogs = async (req, res) => {
+  try {
+    const { search, filter, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const whereClause = {};
+
+    const statusValues = ['Pending', 'Verified', 'Expired', 'Failed'];
+    const purposeValues = ['Booking', 'Registration', 'Login'];
+
+    if (filter) {
+      if (statusValues.includes(filter)) {
+        whereClause.status = filter;
+      } else if (purposeValues.includes(filter)) {
+        whereClause.purpose = filter;
+      }
+    }
+
+    if (search) {
+      whereClause[Op.or] = [
+        { phone: { [Op.like]: `%${search}%` } },
+        { purpose: { [Op.like]: `%${search}%` } },
+        { '$user.name$': { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    const { count, rows } = await OtpLog.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name'],
+        },
+      ],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']],
+    });
+
+    return successResponse(res, 200, 'OTP logs fetched', {
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit),
+      otpLogs: rows.map((log) => ({
+        id: log.id,
+        phone: log.phone,
+        user: log.user ? log.user.name : 'N/A',
+        purpose: log.purpose,
+        status: log.status,
+        createdAt: log.createdAt,
+        verifiedAt: log.verifiedAt,
+      })),
+    });
+  } catch (error) {
+    console.error('OTP log fetch error:', error);
+    return errorResponse(res, 500, 'Failed to fetch OTP logs');
+  }
+};
+
+export const getOtpStats = async (req, res) => {
+  try {
+    const total = await OtpLog.count();
+    const verified = await OtpLog.count({ where: { status: 'Verified' } });
+    const expired = await OtpLog.count({ where: { status: 'Expired' } });
+    const failed = await OtpLog.count({ where: { status: 'Failed' } });
+
+    return successResponse(res, 200, 'OTP statistics fetched successfully', {
+      total,
+      verified,
+      expired,
+      failed,
+    });
+  } catch (err) {
+    console.error('OTP stats error:', err);
+    return errorResponse(res, 500, 'Failed to fetch OTP statistics');
   }
 };

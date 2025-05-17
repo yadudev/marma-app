@@ -1,54 +1,27 @@
 import express from 'express';
-import {
-  getDashboard,
-  getUserList,
-  changeUserStatus,
-  deleteUser,
-} from '../controllers/adminController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+import { isAdmin } from '../middlewares/roleCheck.js';
 
-import {
-  addTherapist,
-  getTherapists,
-  getTherapistById,
-  updateTherapist,
-  deleteTherapist,
-  updateTherapistStatus,
-  getTherapistStats,
-} from '../controllers/therapistController.js';
-
-import { authenticateToken, isAdmin } from '../middlewares/auth.js';
-import multer from 'multer';
-import path from 'path';
+import userRoutes from './admin/userRoutes.js';
+import therapistRoutes from './admin/therapistRoutes.js';
+import bookingRoutes from './admin/bookingRoutes.js';
+import videoRoutes from './admin/videoRoutes.js';
+import otpRoutes from './admin/otpRoutes.js';
+import { getDashboard } from '../controllers/adminController.js';
 
 const router = express.Router();
 
-// Multer config for therapist file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/therapists/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
-const upload = multer({ storage });
+// Apply auth and admin role middleware to all admin routes
+router.use(authenticateToken, isAdmin);
 
-// Admin Dashboard Route
-router.get('/dashboard', authenticateToken, isAdmin, getDashboard);
+// Dashboard
+router.get('/dashboard', getDashboard);
 
-// User Management Routes
-router.get('/users', authenticateToken, isAdmin, getUserList);
-router.patch('/users/:id/status', authenticateToken, isAdmin, changeUserStatus);
-router.delete('/users/:id', authenticateToken, isAdmin, deleteUser);
-
-// Therapist Management Routes
-router.post('/therapists', authenticateToken, isAdmin, upload.single('file'), addTherapist);
-router.get('/therapists', authenticateToken, isAdmin, getTherapists);
-router.get('/therapists/stats', authenticateToken, isAdmin, getTherapistStats);
-router.get('/therapists/:id', authenticateToken, isAdmin, getTherapistById);
-router.put('/therapists/:id', authenticateToken, isAdmin, upload.single('file'), updateTherapist);
-router.delete('/therapists/:id', authenticateToken, isAdmin, deleteTherapist);
-router.patch('/therapists/:id/status', authenticateToken, isAdmin, updateTherapistStatus);
+// Modular Routes
+router.use('/users', userRoutes);
+router.use('/therapists', therapistRoutes);
+router.use('/bookings', bookingRoutes);
+router.use('/learner', videoRoutes);
+router.use('/otp', otpRoutes);
 
 export default router;

@@ -1,20 +1,26 @@
 import sequelize from '../config/db.js';
-import User from './user.js';
-import Role from './role.js';
 
-// Define relationships
+// Direct imports instead of factories
+import Role from './role.js';
+import User from './user.js';
+import LearnerVideo from './learnerVideo.js';
+import Therapist from './therapist.js';
+import Booking from './booking.js';
+import OtpLog from './otpLog.js';
+
+// Define associations
 User.belongsTo(Role, { foreignKey: 'roleId' });
 Role.hasMany(User, { foreignKey: 'roleId' });
+Booking.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+Booking.belongsTo(Therapist, { foreignKey: 'therapistId', as: 'therapist' });
+OtpLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
-// Function to initialize roles
+// Initialize roles
 const initRoles = async () => {
   try {
     const roles = ['admin', 'therapist', 'learner', 'user'];
-
     for (const roleName of roles) {
-      await Role.findOrCreate({
-        where: { name: roleName },
-      });
+      await Role.findOrCreate({ where: { name: roleName } });
     }
     console.log('Roles initialized successfully');
   } catch (error) {
@@ -22,16 +28,13 @@ const initRoles = async () => {
   }
 };
 
-// Function to create default admin if none exists
+// Create default admin
 const createDefaultAdmin = async () => {
   try {
     const adminRole = await Role.findOne({ where: { name: 'admin' } });
     if (!adminRole) return;
 
-    const adminExists = await User.count({
-      where: { roleId: adminRole.id },
-    });
-
+    const adminExists = await User.count({ where: { roleId: adminRole.id } });
     if (adminExists === 0) {
       await User.create({
         name: 'System Admin',
@@ -47,4 +50,15 @@ const createDefaultAdmin = async () => {
   }
 };
 
-export { sequelize, User, Role, initRoles, createDefaultAdmin };
+// Make sure sequelize is included in exports
+export {
+  sequelize, // Make sure this is properly imported at the top
+  User,
+  Role,
+  LearnerVideo,
+  Therapist,
+  Booking,
+  OtpLog,
+  initRoles,
+  createDefaultAdmin,
+};

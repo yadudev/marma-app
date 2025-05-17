@@ -1,12 +1,7 @@
 import jwt from 'jsonwebtoken';
+import { Role, User } from '../models/index.js';
 
-/**
- * Middleware to authenticate the token in the request headers
- * @param {object} req - Request object
- * @param {object} res - Response object
- * @param {function} next - Next middleware function
- */
-export const authenticateToken = (req, res, next) => {
+export const authenticateToken = async (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
   if (!token) {
@@ -14,49 +9,39 @@ export const authenticateToken = (req, res, next) => {
   }
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const userId = decoded.id || decoded.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        message: 'Invalid token structure: no user ID found',
+        tokenData: decoded,
+      });
+    }
+
+    const user = await User.findByPk(userId, {
+      include: [{ model: Role }],
+    });
+
+    if (!user) {
+      const userWithoutRole = await User.findByPk(userId);
+      console.log('User found without Role:', userWithoutRole ? 'Yes' : 'No');
+
+      return res.status(401).json({
+        message: 'User not found',
+        userId: userId,
+        tokenData: decoded,
+      });
+    }
+
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Invalid or expired token', error: error });
+    console.error('Token verification error:', error);
+    return res.status(401).json({
+      message: 'Invalid or expired token',
+      error: error.message,
+    });
   }
-};
-
-/**
- * Middleware to check if the user has an admin role
- * @param {object} req - Request object
- * @param {object} res - Response object
- * @param {function} next - Next middleware function
- */
-export const isAdmin = (req, res, next) => {
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({ message: 'Permission denied: Admin role required' });
-  }
-  next();
-};
-
-/**
- * Middleware to check if the user is a normal user
- * @param {object} req - Request object
- * @param {object} res - Response object
- * @param {function} next - Next middleware function
- */
-export const isUser = (req, res, next) => {
-  if (req.user?.role !== 'user') {
-    return res.status(403).json({ message: 'Permission denied: User role required' });
-  }
-  next();
-};
-
-/**
- * Middleware to check if the user is a therapist
- * @param {object} req - Request object
- * @param {object} res - Response object
- * @param {function} next - Next middleware function
- */
-export const isTherapist = (req, res, next) => {
-  if (req.user?.role !== 'therapist') {
-    return res.status(403).json({ message: 'Permission denied: User role required' });
-  }
-  next();
 };

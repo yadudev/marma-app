@@ -100,7 +100,6 @@ export const forgotPassword = async (req, res) => {
 
     const user = await User.findOne({ where: { email } });
 
-    // Always return success for security, but only continue if user exists
     if (!user) {
       return successResponse(
         res,

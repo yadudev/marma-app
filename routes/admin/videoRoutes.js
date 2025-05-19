@@ -7,6 +7,8 @@ import {
   getVideoById,
   updateVideo,
 } from '../../controllers/learnerVideoController.js';
+import { isAdmin } from '../../middlewares/roleCheck.js';
+import { authenticateToken } from '../../middlewares/auth.js';
 
 const router = express.Router();
 
@@ -16,10 +18,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post('/', upload.single('video'), createVideo);
+router.post('/', authenticateToken, isAdmin, upload.single('video'), createVideo);
 router.get('/', getAllVideos);
 router.get('/:id', getVideoById);
-router.put('/:id', upload.single('video'), updateVideo);
-router.delete('/:id', deleteVideo);
+router.put('/:id', authenticateToken, isAdmin, upload.single('video'), updateVideo);
+router.delete('/:id', authenticateToken, isAdmin, deleteVideo);
 
 export default router;

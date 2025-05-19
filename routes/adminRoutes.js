@@ -1,6 +1,4 @@
 import express from 'express';
-import { authenticateToken } from '../middlewares/auth.js';
-import { isAdmin } from '../middlewares/roleCheck.js';
 
 import userRoutes from './admin/userRoutes.js';
 import therapistRoutes from './admin/therapistRoutes.js';
@@ -10,9 +8,6 @@ import otpRoutes from './admin/otpRoutes.js';
 import { getDashboard } from '../controllers/adminController.js';
 
 const router = express.Router();
-
-// Apply auth and admin role middleware to all admin routes
-router.use(authenticateToken, isAdmin);
 
 // Dashboard
 router.get('/dashboard', getDashboard);

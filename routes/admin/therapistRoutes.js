@@ -10,6 +10,8 @@ import {
   updateTherapistStatus,
   getTherapistStats,
 } from '../../controllers/therapistController.js';
+import { authenticateToken } from '../../middlewares/auth.js';
+import { isAdmin } from '../../middlewares/roleCheck.js';
 
 const router = express.Router();
 
@@ -26,12 +28,12 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post('/', upload.single('file'), addTherapist);
+router.post('/', authenticateToken, isAdmin, upload.single('file'), addTherapist);
 router.get('/', getTherapists);
 router.get('/stats', getTherapistStats);
 router.get('/:id', getTherapistById);
-router.put('/:id', upload.single('file'), updateTherapist);
-router.delete('/:id', deleteTherapist);
-router.patch('/:id/status', updateTherapistStatus);
+router.put('/:id', authenticateToken, isAdmin, upload.single('file'), updateTherapist);
+router.delete('/:id', authenticateToken, isAdmin, deleteTherapist);
+router.patch('/:id/status', authenticateToken, isAdmin, updateTherapistStatus);
 
 export default router;

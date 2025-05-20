@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db.js');
 
 const LearnerVideo = sequelize.define('LearnerVideo', {
   name: {
@@ -21,4 +21,4 @@ LearnerVideo.prototype.toJSON = function () {
   return values;
 };
 
-export default LearnerVideo;
+module.exports = LearnerVideo;

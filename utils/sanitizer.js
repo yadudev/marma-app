@@ -1,11 +1,11 @@
-import xss from 'xss';
+const xss = require('xss');
 
 /**
  * Sanitize a string to prevent XSS attacks
  * @param {string} str - String to sanitize
  * @returns {string} - Sanitized string
  */
-export const sanitizeString = (str) => {
+const sanitizeString = (str) => {
   if (typeof str !== 'string') return str;
   return xss(str.trim());
 };
@@ -15,7 +15,7 @@ export const sanitizeString = (str) => {
  * @param {string} email - Email to sanitize
  * @returns {string} - Sanitized email
  */
-export const sanitizeEmail = (email) => {
+const sanitizeEmail = (email) => {
   if (typeof email !== 'string') return email;
   return email.trim().toLowerCase();
 };
@@ -25,7 +25,7 @@ export const sanitizeEmail = (email) => {
  * @param {object} obj - Object to sanitize
  * @returns {object} - Sanitized object
  */
-export const sanitizeObject = (obj) => {
+const sanitizeObject = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
 
   const sanitized = {};
@@ -58,4 +58,10 @@ export const sanitizeObject = (obj) => {
   });
 
   return sanitized;
+};
+
+module.exports = {
+  sanitizeString,
+  sanitizeEmail,
+  sanitizeObject,
 };

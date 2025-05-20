@@ -1,8 +1,8 @@
-import { Op } from 'sequelize';
-import { Therapist } from '../models/index.js';
+const { Op } = require('sequelize');
+const { Therapist } = require('../models/index.js');
 
 // Add a new therapist
-export const addTherapist = async (req, res) => {
+exports.addTherapist = async (req, res) => {
   try {
     const { name, clinicName, email, phone, specialization, experience, availability } = req.body;
     const file = req.file ? req.file.filename : null;
@@ -26,7 +26,7 @@ export const addTherapist = async (req, res) => {
 };
 
 // Get all therapists (with optional filters)
-export const getTherapists = async (req, res) => {
+exports.getTherapists = async (req, res) => {
   try {
     const { status, availability, searchTerm } = req.query;
 
@@ -90,7 +90,7 @@ export const getTherapists = async (req, res) => {
 };
 
 // Get a single therapist by ID
-export const getTherapistById = async (req, res) => {
+exports.getTherapistById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -108,7 +108,7 @@ export const getTherapistById = async (req, res) => {
 };
 
 // Update a therapist
-export const updateTherapist = async (req, res) => {
+exports.updateTherapist = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -133,7 +133,7 @@ export const updateTherapist = async (req, res) => {
 };
 
 // Delete a therapist
-export const deleteTherapist = async (req, res) => {
+exports.deleteTherapist = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -153,7 +153,7 @@ export const deleteTherapist = async (req, res) => {
 };
 
 // Update therapist status (approve, reject, etc.)
-export const updateTherapistStatus = async (req, res) => {
+exports.updateTherapistStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -173,7 +173,8 @@ export const updateTherapistStatus = async (req, res) => {
   }
 };
 
-export const getTherapistStats = async (req, res) => {
+// Get therapist statistics
+exports.getTherapistStats = async (req, res) => {
   try {
     const totalTherapists = await Therapist.count();
 
@@ -206,7 +207,7 @@ export const getTherapistStats = async (req, res) => {
     const recentlyJoined = await Therapist.count({
       where: {
         createdAt: {
-          [Op.gte]: new Date(new Date() - 7 * 24 * 60 * 60 * 1000),
+          [Op.gte]: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
         },
       },
     });

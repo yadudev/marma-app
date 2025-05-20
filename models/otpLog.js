@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db.js');
 
 const OtpLog = sequelize.define('OtpLog', {
   phone: {
@@ -29,4 +29,4 @@ OtpLog.prototype.toJSON = function () {
   return values;
 };
 
-export default OtpLog;
+module.exports = OtpLog;

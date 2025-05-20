@@ -1,7 +1,7 @@
-import eslintPluginNode from 'eslint-plugin-node';
+const eslintPluginNode = require('eslint-plugin-node');
 
 /** @type {import("eslint").Linter.FlatConfig} */
-export default [
+module.exports = [
   {
     files: ['**/*.js'],
     languageOptions: {

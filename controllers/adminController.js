@@ -1,8 +1,9 @@
-import { Op } from 'sequelize';
-import { User, Role, OtpLog } from '../models/index.js';
-import { successResponse, errorResponse } from '../utils/responseHandler.js';
+const { Op } = require('sequelize');
+const { User, Role, OtpLog } = require('../models');
+const { successResponse, errorResponse } = require('../utils/responseHandler');
 
-export const getDashboard = async (req, res) => {
+// Dashboard API
+const getDashboard = async (req, res) => {
   try {
     const adminRole = await Role.findOne({ where: { name: 'admin' } });
 
@@ -59,7 +60,7 @@ export const getDashboard = async (req, res) => {
 };
 
 // User List API
-export const getUserList = async (req, res) => {
+const getUserList = async (req, res) => {
   try {
     const {
       page = 1,
@@ -72,7 +73,6 @@ export const getUserList = async (req, res) => {
     } = req.query;
     const offset = (page - 1) * limit;
 
-    // Build where clause
     const whereClause = {};
 
     if (search) {
@@ -105,7 +105,6 @@ export const getUserList = async (req, res) => {
       'lastLogin',
     ];
     const validSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
-
     const validSortOrder = ['ASC', 'DESC'].includes(sortOrder.toUpperCase()) ? sortOrder : 'DESC';
 
     const { count, rows: users } = await User.findAndCountAll({
@@ -130,7 +129,7 @@ export const getUserList = async (req, res) => {
 };
 
 // Change User Status API
-export const changeUserStatus = async (req, res) => {
+const changeUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -166,7 +165,7 @@ export const changeUserStatus = async (req, res) => {
 };
 
 // Delete User API
-export const deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -189,7 +188,8 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-export const getOtpLogs = async (req, res) => {
+// OTP Logs API
+const getOtpLogs = async (req, res) => {
   try {
     const { search, filter, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
@@ -249,7 +249,8 @@ export const getOtpLogs = async (req, res) => {
   }
 };
 
-export const getOtpStats = async (req, res) => {
+// OTP Stats API
+const getOtpStats = async (req, res) => {
   try {
     const total = await OtpLog.count();
     const verified = await OtpLog.count({ where: { status: 'Verified' } });
@@ -266,4 +267,13 @@ export const getOtpStats = async (req, res) => {
     console.error('OTP stats error:', err);
     return errorResponse(res, 500, 'Failed to fetch OTP statistics');
   }
+};
+
+module.exports = {
+  getDashboard,
+  getUserList,
+  changeUserStatus,
+  deleteUser,
+  getOtpLogs,
+  getOtpStats,
 };

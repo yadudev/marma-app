@@ -1,13 +1,14 @@
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
-// Create a transporter using your email service provider (example: Gmail)
+// Create a transporter using Gmail SMTP
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Or use another service like 'smtp' or 'sendgrid'
+  service: 'gmail',
   host: 'smtp.gmail.com',
-  port: 484,
+  port: 587, // Correct port for Gmail SMTP with TLS
+  secure: false, // false for TLS port 587
   auth: {
-    user: process.env.EMAIL_USER, // Your email address
-    pass: process.env.EMAIL_PASS, // Your email password (consider using an App Password for Gmail)
+    user: process.env.EMAIL_USER, // Your Gmail address
+    pass: process.env.EMAIL_PASS, // Your Gmail app password or normal password (less secure apps must be enabled)
   },
 });
 
@@ -33,7 +34,7 @@ const sendEmail = async (mailOptions) => {
  * @param {string} userName - The user's name
  * @returns {string} - The HTML template for the password reset email
  */
-export const emailTemplates = {
+const emailTemplates = {
   resetPassword: (resetUrl, userName) => {
     return `
       <html>
@@ -82,7 +83,6 @@ export const emailTemplates = {
     `;
   },
 
-  // Add more templates as needed
   welcomeEmail: (userName) => {
     return `
       <html>
@@ -95,5 +95,4 @@ export const emailTemplates = {
   },
 };
 
-// Default export for sendEmail
-export default sendEmail;
+module.exports = { sendEmail, emailTemplates };

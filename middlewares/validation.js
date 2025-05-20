@@ -1,5 +1,5 @@
-import { validateObject } from '../utils/validator.js';
-import { errorResponse } from '../utils/responseHandler.js';
+const { validateObject } = require('../utils/validator.js');
+const { errorResponse } = require('../utils/responseHandler.js');
 
 /**
  * Middleware factory for request validation
@@ -8,7 +8,7 @@ import { errorResponse } from '../utils/responseHandler.js';
  * @param {object} paramSchema - Validation schema for route params (optional)
  * @returns {function} - Express middleware
  */
-export const validateRequest = (schema = {}, querySchema = {}, paramSchema = {}) => {
+const validateRequest = (schema = {}, querySchema = {}, paramSchema = {}) => {
   return (req, res, next) => {
     // Validate body
     if (Object.keys(schema).length > 0) {
@@ -39,7 +39,7 @@ export const validateRequest = (schema = {}, querySchema = {}, paramSchema = {})
 };
 
 // Predefined validation schemas
-export const validationSchemas = {
+const validationSchemas = {
   login: {
     email: 'email',
     password: 'password',
@@ -60,4 +60,9 @@ export const validationSchemas = {
     page: 'numeric',
     limit: 'numeric',
   },
+};
+
+module.exports = {
+  validateRequest,
+  validationSchemas,
 };

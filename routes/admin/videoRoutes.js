@@ -1,14 +1,14 @@
-import express from 'express';
-import multer from 'multer';
-import {
+const express = require('express');
+const multer = require('multer');
+const {
   createVideo,
   deleteVideo,
   getAllVideos,
   getVideoById,
   updateVideo,
-} from '../../controllers/learnerVideoController.js';
-import { isAdmin } from '../../middlewares/roleCheck.js';
-import { authenticateToken } from '../../middlewares/auth.js';
+} = require('../../controllers/learnerVideoController.js');
+const authenticateToken = require('../../middlewares/auth.js');
+const { isAdmin } = require('../../middlewares/roleCheck.js');
 
 const router = express.Router();
 
@@ -24,4 +24,4 @@ router.get('/:id', getVideoById);
 router.put('/:id', authenticateToken, isAdmin, upload.single('video'), updateVideo);
 router.delete('/:id', authenticateToken, isAdmin, deleteVideo);
 
-export default router;
+module.exports = router;

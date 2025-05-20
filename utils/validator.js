@@ -1,4 +1,4 @@
-export const rules = {
+const rules = {
   email: {
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     message: 'Please provide a valid email address',
@@ -32,7 +32,7 @@ export const rules = {
  * @param {string} ruleName - Name of the rule to validate against
  * @returns {object} - Validation result {valid: boolean, message: string}
  */
-export const validate = (value, ruleName) => {
+const validate = (value, ruleName) => {
   const rule = rules[ruleName];
   if (!rule) {
     return { valid: false, message: 'Invalid validation rule' };
@@ -51,15 +51,14 @@ export const validate = (value, ruleName) => {
  * @param {object} schema - Validation schema {field: ruleName}
  * @returns {object} - Validation result {valid: boolean, errors: object}
  */
-export const validateObject = (data, schema) => {
+const validateObject = (data, schema) => {
   const errors = {};
   let valid = true;
 
   Object.keys(schema).forEach((field) => {
     const ruleName = schema[field];
-    // Skip validation if field is not present and it's not required
     if (data[field] === undefined || data[field] === null) {
-      return;
+      return; // skip if no value to validate
     }
 
     const validationResult = validate(data[field], ruleName);
@@ -70,4 +69,10 @@ export const validateObject = (data, schema) => {
   });
 
   return { valid, errors };
+};
+
+module.exports = {
+  rules,
+  validate,
+  validateObject,
 };

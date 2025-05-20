@@ -1,8 +1,8 @@
-import { LearnerVideo } from '../models/index.js';
-import { successResponse, errorResponse } from '../utils/responseHandler.js';
+const { LearnerVideo } = require('../models/index.js');
+const { successResponse, errorResponse } = require('../utils/responseHandler.js');
 
 // Create Video
-export const createVideo = async (req, res) => {
+exports.createVideo = async (req, res) => {
   try {
     const { name, duration } = req.body;
     const videoUrl = req.file?.path;
@@ -21,7 +21,7 @@ export const createVideo = async (req, res) => {
 };
 
 // Get All Videos
-export const getAllVideos = async (req, res) => {
+exports.getAllVideos = async (req, res) => {
   try {
     const videos = await LearnerVideo.findAll();
     return successResponse(res, 200, 'Videos retrieved successfully', videos);
@@ -32,14 +32,14 @@ export const getAllVideos = async (req, res) => {
 };
 
 // Get a single video by ID
-export const getVideoById = async (req, res) => {
+exports.getVideoById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const learnerVideo = await LearnerVideo.findByPk(id);
 
     if (!learnerVideo) {
-      return res.status(404).json({ success: false, message: 'learner video not found' });
+      return res.status(404).json({ success: false, message: 'Learner video not found' });
     }
 
     res.status(200).json({ success: true, data: learnerVideo });
@@ -50,7 +50,7 @@ export const getVideoById = async (req, res) => {
 };
 
 // Update Video
-export const updateVideo = async (req, res) => {
+exports.updateVideo = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, duration } = req.body;
@@ -75,7 +75,7 @@ export const updateVideo = async (req, res) => {
 };
 
 // Delete Video
-export const deleteVideo = async (req, res) => {
+exports.deleteVideo = async (req, res) => {
   try {
     const { id } = req.params;
 

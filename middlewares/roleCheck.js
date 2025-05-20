@@ -1,12 +1,11 @@
-// Additional debug utility for the role check middleware
-import { errorResponse } from '../utils/responseHandler.js';
+const { errorResponse } = require('../utils/responseHandler.js');
 
 /**
  * Middleware factory for role-based access control with enhanced debugging
  * @param {Array} allowedRoles - Array of allowed role names
  * @returns {function} - Express middleware
  */
-export const checkRole = (allowedRoles = []) => {
+const checkRole = (allowedRoles = []) => {
   return (req, res, next) => {
     if (!req.user) {
       return errorResponse(res, 403, 'Access denied. User not authenticated.');
@@ -30,8 +29,17 @@ export const checkRole = (allowedRoles = []) => {
 };
 
 // Predefined role check middlewares
-export const isAdmin = checkRole(['admin']);
-export const isTherapist = checkRole(['therapist']);
-export const isLearner = checkRole(['learner']);
-export const isUser = checkRole(['user']);
-export const isAdminOrTherapist = checkRole(['admin', 'therapist']);
+const isAdmin = checkRole(['admin']);
+const isTherapist = checkRole(['therapist']);
+const isLearner = checkRole(['learner']);
+const isUser = checkRole(['user']);
+const isAdminOrTherapist = checkRole(['admin', 'therapist']);
+
+module.exports = {
+  checkRole,
+  isAdmin,
+  isTherapist,
+  isLearner,
+  isUser,
+  isAdminOrTherapist,
+};

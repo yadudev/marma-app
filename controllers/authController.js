@@ -1,9 +1,10 @@
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import { Op } from 'sequelize';
-import { User, Role } from '../models/index.js';
-import sendEmail, { emailTemplates } from '../utils/emailService.js';
-import { successResponse, errorResponse } from '../utils/responseHandler.js';
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { Op } = require('sequelize');
+const { User, Role } = require('../models');
+const sendEmail = require('../utils/emailService');
+const { emailTemplates } = require('../utils/emailService');
+const { successResponse, errorResponse } = require('../utils/responseHandler');
 
 // Create admin user if not exists
 const createAdminIfNotExists = async () => {
@@ -45,7 +46,7 @@ const createAdminIfNotExists = async () => {
 };
 
 // Login
-export const login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { emailOrUsername, password } = req.body;
 
@@ -94,7 +95,7 @@ export const login = async (req, res) => {
 };
 
 // Forgot Password
-export const forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -143,7 +144,7 @@ export const forgotPassword = async (req, res) => {
 };
 
 // Reset Password
-export const resetPassword = async (req, res) => {
+const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
@@ -170,4 +171,11 @@ export const resetPassword = async (req, res) => {
     console.error('Reset password error:', error);
     return errorResponse(res, 500, 'Server error');
   }
+};
+
+// Export the functions
+module.exports = {
+  login,
+  forgotPassword,
+  resetPassword,
 };

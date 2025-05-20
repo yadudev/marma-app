@@ -1,12 +1,12 @@
-import sequelize from '../config/db.js';
+const sequelize = require('../config/db.js');
 
 // Direct imports instead of factories
-import Role from './role.js';
-import User from './user.js';
-import LearnerVideo from './learnerVideo.js';
-import Therapist from './therapist.js';
-import Booking from './booking.js';
-import OtpLog from './otpLog.js';
+const Role = require('./role.js');
+const User = require('./user.js');
+const LearnerVideo = require('./learnerVideo.js');
+const Therapist = require('./therapist.js');
+const Booking = require('./booking.js');
+const OtpLog = require('./otpLog.js');
 
 // Define associations
 User.belongsTo(Role, { foreignKey: 'roleId' });
@@ -50,9 +50,8 @@ const createDefaultAdmin = async () => {
   }
 };
 
-// Make sure sequelize is included in exports
-export {
-  sequelize, // Make sure this is properly imported at the top
+module.exports = {
+  sequelize,
   User,
   Role,
   LearnerVideo,

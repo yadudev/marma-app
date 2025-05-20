@@ -1,4 +1,4 @@
-export const getDashboard = async (req, res) => {
+exports.getDashboard = async (req, res) => {
   try {
     const user = req.user;
 

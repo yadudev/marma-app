@@ -1,11 +1,11 @@
-import express from 'express';
+const express = require('express');
 
-import userRoutes from './admin/userRoutes.js';
-import therapistRoutes from './admin/therapistRoutes.js';
-import bookingRoutes from './admin/bookingRoutes.js';
-import videoRoutes from './admin/videoRoutes.js';
-import otpRoutes from './admin/otpRoutes.js';
-import { getDashboard } from '../controllers/adminController.js';
+const userRoutes = require('./admin/userRoutes.js');
+const therapistRoutes = require('./admin/therapistRoutes.js');
+const bookingRoutes = require('./admin/bookingRoutes.js');
+const videoRoutes = require('./admin/videoRoutes.js');
+const otpRoutes = require('./admin/otpRoutes.js');
+const { getDashboard } = require('../controllers/adminController.js');
 
 const router = express.Router();
 
@@ -19,4 +19,4 @@ router.use('/bookings', bookingRoutes);
 router.use('/learner', videoRoutes);
 router.use('/otp', otpRoutes);
 
-export default router;
+module.exports = router;

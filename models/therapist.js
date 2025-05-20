@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db.js');
 
 const Therapist = sequelize.define(
   'Therapist',
@@ -72,4 +72,4 @@ Therapist.prototype.toJSON = function () {
   return values;
 };
 
-export default Therapist;
+module.exports = Therapist;

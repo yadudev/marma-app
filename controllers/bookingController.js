@@ -1,9 +1,9 @@
-import { Op } from 'sequelize';
-import { successResponse, errorResponse } from '../utils/responseHandler.js';
-import { Booking, User, Therapist } from '../models/index.js';
+const { Op } = require('sequelize');
+const { successResponse, errorResponse } = require('../utils/responseHandler.js');
+const { Booking, User, Therapist } = require('../models/index.js');
 
 // Booking Statistics
-export const getBookingStats = async (req, res) => {
+exports.getBookingStats = async (req, res) => {
   try {
     const total = await Booking.count();
 
@@ -30,7 +30,7 @@ export const getBookingStats = async (req, res) => {
 };
 
 // Booking List with User & Therapist Info
-export const getBookingList = async (req, res) => {
+exports.getBookingList = async (req, res) => {
   try {
     const { status, search, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
@@ -76,7 +76,7 @@ export const getBookingList = async (req, res) => {
 };
 
 // View Individual Booking with User & Therapist
-export const getBookingById = async (req, res) => {
+exports.getBookingById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -107,7 +107,7 @@ export const getBookingById = async (req, res) => {
 };
 
 // Change Booking Status
-export const changeBookingStatus = async (req, res) => {
+exports.changeBookingStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -131,7 +131,7 @@ export const changeBookingStatus = async (req, res) => {
 };
 
 // Cancel Booking
-export const cancelBooking = async (req, res) => {
+exports.cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
 

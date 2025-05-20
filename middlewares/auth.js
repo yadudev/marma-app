@@ -1,8 +1,12 @@
-import jwt from 'jsonwebtoken';
-import { Role, User } from '../models/index.js';
+const jwt = require('jsonwebtoken');
+const { Role, User } = require('../models/index.js');
 
-export const authenticateToken = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+const authenticateToken = async (req, res, next) => {
+  const authHeader = req.header('Authorization');
+  const token =
+    authHeader && authHeader.split(' ')[0].toLowerCase() === 'bearer'
+      ? authHeader.split(' ')[1]
+      : null;
 
   if (!token) {
     return res.status(403).json({ message: 'Access denied, token missing' });
@@ -45,3 +49,5 @@ export const authenticateToken = async (req, res, next) => {
     });
   }
 };
+
+module.exports = authenticateToken;

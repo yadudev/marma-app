@@ -1,13 +1,14 @@
-import express from 'express';
-import {
+const express = require('express');
+const {
   getBookingStats,
   getBookingList,
   getBookingById,
   changeBookingStatus,
   cancelBooking,
-} from '../../controllers/bookingController.js';
-import { authenticateToken } from '../../middlewares/auth.js';
-import { isAdmin } from '../../middlewares/roleCheck.js';
+} = require('../../controllers/bookingController.js');
+
+const authenticateToken = require('../../middlewares/auth.js');
+const { isAdmin } = require('../../middlewares/roleCheck.js');
 
 const router = express.Router();
 
@@ -17,4 +18,4 @@ router.get('/:id', getBookingById);
 router.patch('/:id/status', authenticateToken, isAdmin, changeBookingStatus);
 router.patch('/:id/cancel', authenticateToken, isAdmin, cancelBooking);
 
-export default router;
+module.exports = router;

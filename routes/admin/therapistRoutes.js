@@ -1,7 +1,7 @@
-import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import {
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const {
   addTherapist,
   getTherapists,
   getTherapistById,
@@ -9,9 +9,9 @@ import {
   deleteTherapist,
   updateTherapistStatus,
   getTherapistStats,
-} from '../../controllers/therapistController.js';
-import { authenticateToken } from '../../middlewares/auth.js';
-import { isAdmin } from '../../middlewares/roleCheck.js';
+} = require('../../controllers/therapistController.js');
+const authenticateToken = require('../../middlewares/auth.js');
+const { isAdmin } = require('../../middlewares/roleCheck.js');
 
 const router = express.Router();
 
@@ -36,4 +36,4 @@ router.put('/:id', authenticateToken, isAdmin, upload.single('file'), updateTher
 router.delete('/:id', authenticateToken, isAdmin, deleteTherapist);
 router.patch('/:id/status', authenticateToken, isAdmin, updateTherapistStatus);
 
-export default router;
+module.exports = router;

@@ -1,11 +1,12 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import authRoutes from './routes/authRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import { sequelize } from './models/index.js'; // Ensure this path is correct
-import helmet from 'helmet';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const helmet = require('helmet');
+
+const authRoutes = require('./routes/authRoutes.js');
+const adminRoutes = require('./routes/adminRoutes.js');
+const userRoutes = require('./routes/userRoutes.js');
+const { sequelize } = require('./models/index.js'); // Ensure this path is correct
 
 // Load environment variables from .env
 dotenv.config();
@@ -31,7 +32,7 @@ sequelize
 
 // Sync DB (create tables if they don't exist)
 sequelize
-  .sync({ alter: false }) // use { force: true } for dev reset (drops and recreates tables)
+  .sync({ alter: false })
   .then(() => {
     console.log('All models were synchronized successfully.');
   })
@@ -45,9 +46,9 @@ app.get('/', (req, res) => {
 });
 
 // API Routes
-app.use('/api/auth', authRoutes); // Auth routes like /login
-app.use('/api/admin', adminRoutes); // Admin dashboard, user list, etc.
-app.use('/api/user', userRoutes); // User dashboard, etc.
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/user', userRoutes);
 
 // Global Error Handling Middleware
 app.use((err, req, res) => {
@@ -59,4 +60,4 @@ app.use((err, req, res) => {
   });
 });
 
-export default app;
+module.exports = app;

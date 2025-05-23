@@ -1,27 +1,59 @@
 const { Op } = require('sequelize');
-const { Therapist } = require('../models/index.js');
-
+const { Therapist, sequelize, Role, User } = require('../models/index.js');
+const bcrypt = require('bcryptjs');
 // Add a new therapist
 exports.addTherapist = async (req, res) => {
+  const transaction = await sequelize.transaction();
   try {
     const { name, clinicName, email, phone, specialization, experience, availability } = req.body;
     const file = req.file ? req.file.filename : null;
 
-    const therapist = await Therapist.create({
-      name,
-      clinicName,
-      email,
-      phone,
-      specialization,
-      experience,
-      availability,
-      file,
-    });
+    const therapistRole = await Role.findOne({ where: { name: 'therapist' } });
+    if (!therapistRole) {
+      return res.status(400).json({ success: false, message: 'Therapist role not found' });
+    }
 
-    res.status(201).json({ success: true, data: therapist });
+    const therapist = await Therapist.create(
+      {
+        name,
+        clinicName,
+        email,
+        phone,
+        specialization,
+        experience,
+        availability,
+        file,
+      },
+      { transaction }
+    );
+
+    const defaultPassword = 'Therapist@123';
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    const user = await User.create(
+      {
+        name,
+        username: email.split('@')[0],
+        email,
+        phone,
+        password: hashedPassword,
+        roleId: therapistRole.id,
+        status: 'active',
+      },
+      { transaction }
+    );
+
+    await transaction.commit();
+
+    res.status(201).json({
+      success: true,
+      message: 'Therapist and user created successfully',
+      data: { therapist, user },
+    });
   } catch (error) {
-    console.error('Error creating therapist:', error);
-    res.status(500).json({ success: false, message: 'Failed to add therapist.' });
+    await transaction.rollback();
+    console.error('Error creating therapist and user:', error);
+    res.status(500).json({ success: false, message: 'Failed to add therapist and user.' });
   }
 };
 
@@ -68,10 +100,8 @@ exports.getTherapists = async (req, res) => {
       id: therapist.id,
       name: therapist.name,
       clinicName: therapist.clinicName,
-      contact: {
-        email: therapist.email,
-        phone: therapist.phone,
-      },
+      email: therapist.email,
+      phone: therapist.phone,
       availability: therapist.availability,
       rating: therapist.rating || 'Not rated',
       status: therapist.status,

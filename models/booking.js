@@ -16,14 +16,22 @@ const Booking = sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'id',
+      },
     },
     therapistId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'Therapists',
+        key: 'id',
+      },
     },
     status: {
-      type: DataTypes.ENUM('Upcoming', 'Ongoing', 'Completed', 'Cancelled'),
-      defaultValue: 'Upcoming',
+      type: DataTypes.ENUM('upcoming', 'ongoing', 'completed', 'cancelled'),
+      defaultValue: 'upcoming',
       allowNull: false,
     },
     date: {

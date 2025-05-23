@@ -15,8 +15,8 @@ const OtpLog = sequelize.define('OtpLog', {
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM('Pending', 'Verified', 'Expired', 'Failed'),
-    defaultValue: 'Pending',
+    type: DataTypes.ENUM('verified', 'expired', 'failed', 'pending'),
+    defaultValue: 'pending',
   },
   verifiedAt: {
     type: DataTypes.DATE,

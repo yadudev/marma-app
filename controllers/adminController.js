@@ -89,10 +89,15 @@ const getUserList = async (req, res) => {
     const includeClause = {
       model: Role,
       attributes: ['id', 'name'],
+      where: {
+        name: {
+          [Op.ne]: 'admin',
+        },
+      },
     };
 
     if (role) {
-      includeClause.where = { name: role };
+      includeClause.where.name = role;
     }
 
     const allowedSortFields = [
@@ -196,8 +201,8 @@ const getOtpLogs = async (req, res) => {
 
     const whereClause = {};
 
-    const statusValues = ['Pending', 'Verified', 'Expired', 'Failed'];
-    const purposeValues = ['Booking', 'Registration', 'Login'];
+    const statusValues = ['pending', 'verified', 'expired', 'failed'];
+    const purposeValues = ['booking', 'registration', 'login'];
 
     if (filter) {
       if (statusValues.includes(filter)) {

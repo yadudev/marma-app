@@ -41,8 +41,8 @@ const Therapist = sequelize.define(
       },
     },
     availability: {
-      type: DataTypes.ENUM('Online', 'Offline'),
-      defaultValue: 'Offline',
+      type: DataTypes.ENUM('online', 'offline'),
+      defaultValue: 'offline',
     },
     rating: {
       type: DataTypes.FLOAT,
@@ -57,8 +57,8 @@ const Therapist = sequelize.define(
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM('Pending', 'Approved', 'Inactive'),
-      defaultValue: 'Pending',
+      type: DataTypes.ENUM('pending', 'approved', 'rejected'),
+      defaultValue: 'pending',
     },
   },
   {
